@@ -1,7 +1,13 @@
 from rest_framework import authentication
 from rest_framework import exceptions
+from rest_framework.permissions import BasePermission
 
 from apps.tenants.models import APIKey
+
+
+class IsAPIKeyAuthenticated(BasePermission):
+    def has_permission(self, request, view):
+        return request.auth is not None
 
 
 class APIKeyAuthentication(authentication.BaseAuthentication):
