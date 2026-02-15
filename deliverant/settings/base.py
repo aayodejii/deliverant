@@ -87,6 +87,7 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
+CELERY_IMPORTS = ["workers.scheduler", "workers.delivery", "workers.lease"]
 
 REDIS_URL = env("REDIS_URL", default="redis://localhost:6379/0")
 
