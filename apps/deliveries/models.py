@@ -44,6 +44,7 @@ class Delivery(models.Model):
     )
     idempotency_key = models.CharField(max_length=255, null=True, blank=True)
     idempotency_key_hash = models.CharField(max_length=64, null=True, blank=True)
+    idempotency_key_reused = models.BooleanField(default=False)
     status = models.CharField(
         max_length=15,
         choices=Status.choices,
@@ -76,13 +77,6 @@ class Delivery(models.Model):
             models.Index(
                 fields=["tenant_id", "endpoint_id", "idempotency_key_hash"],
                 name="idx_deliveries_dedup",
-            ),
-        ]
-        constraints = [
-            models.UniqueConstraint(
-                fields=["tenant_id", "endpoint_id", "idempotency_key_hash"],
-                name="unique_delivery_idempotency",
-                condition=models.Q(idempotency_key_hash__isnull=False),
             ),
         ]
 

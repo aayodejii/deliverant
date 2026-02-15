@@ -1,7 +1,9 @@
 import hashlib
 import json
+from datetime import timedelta
 
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import serializers
 
 from apps.deliveries.models import Delivery
@@ -52,6 +54,7 @@ class EventCreateSerializer(serializers.Serializer):
         endpoints = Endpoint.objects.filter(tenant=tenant, id__in=validated_data["endpoint_ids"])
         idempotency_key = validated_data.get("idempotency_key")
         deliveries = []
+        dedup_window = timezone.now() - timedelta(hours=settings.DEDUP_WINDOW_HOURS)
 
         for endpoint in endpoints:
             if idempotency_key:
@@ -63,17 +66,39 @@ class EventCreateSerializer(serializers.Serializer):
                     f"{tenant.id}:{endpoint.id}:{event.type}:{payload_hash}".encode()
                 ).hexdigest()
 
-            delivery, created = Delivery.objects.get_or_create(
+            existing = Delivery.objects.filter(
                 tenant=tenant,
                 endpoint=endpoint,
                 idempotency_key_hash=key_hash,
-                defaults={
-                    "event": event,
-                    "mode": mode,
-                    "idempotency_key": idempotency_key,
-                    "status": Delivery.Status.PENDING,
-                },
-            )
+                created_at__gte=dedup_window,
+            ).first()
+
+            if existing:
+                if mode == Delivery.Mode.RELIABLE and existing.event.payload_hash != payload_hash:
+                    raise serializers.ValidationError({
+                        "idempotency_key": "Idempotency key reused with different payload"
+                    })
+                delivery = existing
+                created = False
+            else:
+                was_reused = Delivery.objects.filter(
+                    tenant=tenant,
+                    endpoint=endpoint,
+                    idempotency_key_hash=key_hash,
+                ).exists()
+
+                delivery = Delivery.objects.create(
+                    tenant=tenant,
+                    endpoint=endpoint,
+                    event=event,
+                    mode=mode,
+                    idempotency_key=idempotency_key,
+                    idempotency_key_hash=key_hash,
+                    idempotency_key_reused=was_reused,
+                    status=Delivery.Status.PENDING,
+                )
+                created = True
+
             deliveries.append({"delivery": delivery, "created": created})
 
         return {"event": event, "deliveries": deliveries}
