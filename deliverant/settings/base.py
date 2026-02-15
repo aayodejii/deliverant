@@ -17,6 +17,9 @@ INSTALLED_APPS = [
     "rest_framework",
     "apps.tenants",
     "apps.endpoints",
+    "apps.events",
+    "apps.deliveries",
+    "apps.attempts",
     "apps.api",
 ]
 
