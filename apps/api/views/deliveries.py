@@ -1,4 +1,3 @@
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,6 +5,7 @@ from rest_framework.views import APIView
 from apps.api.authentication import APIKeyAuthentication, IsAPIKeyAuthenticated
 from apps.api.serializers.deliveries import DeliverySerializer, DeliveryDetailSerializer
 from apps.deliveries.models import Delivery
+from apps.deliveries.state_machine import DeliveryStateMachine
 
 
 class DeliveryListView(APIView):
@@ -69,21 +69,18 @@ class DeliveryCancelView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        if delivery.is_terminal:
+        try:
+            DeliveryStateMachine.cancel(delivery)
+        except ValueError as e:
             return Response(
                 {
                     "error": {
                         "code": "INVALID_STATE",
-                        "message": f"Cannot cancel delivery in {delivery.status} state",
+                        "message": str(e),
                         "details": {},
                     }
                 },
                 status=status.HTTP_409_CONFLICT,
             )
-
-        delivery.status = Delivery.Status.CANCELLED
-        delivery.terminal_at = timezone.now()
-        delivery.terminal_reason = "Cancelled by user"
-        delivery.save(update_fields=["status", "terminal_at", "terminal_reason", "updated_at"])
 
         return Response({"status": "cancelled", "delivery_id": str(delivery.id)})
