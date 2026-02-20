@@ -5,11 +5,14 @@ from django.utils import timezone
 from apps.deliveries.models import Delivery
 from apps.deliveries.state_machine import DeliveryStateMachine
 from deliverant.celery import app
+from workers import kill_switch
 
 
 @app.task
 def schedule_due_deliveries():
-    """Find PENDING deliveries and transition them to SCHEDULED."""
+    if kill_switch.is_active():
+        return {"status": "skipped", "reason": "kill_switch_active"}
+
     now = timezone.now()
 
     with transaction.atomic():

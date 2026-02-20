@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     "apps.events",
     "apps.deliveries",
     "apps.attempts",
+    "apps.replays",
     "apps.api",
 ]
 
@@ -90,6 +91,13 @@ CELERY_TIMEZONE = "UTC"
 CELERY_IMPORTS = ["workers.scheduler", "workers.delivery", "workers.lease"]
 
 REDIS_URL = env("REDIS_URL", default="redis://localhost:6379/0")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URL,
+    }
+}
 
 MAX_PAYLOAD_SIZE = 256 * 1024  # 256 KB
 DEFAULT_RETENTION_DAYS = 30

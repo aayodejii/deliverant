@@ -12,12 +12,7 @@ from apps.attempts.models import Attempt
 from apps.deliveries.models import Delivery
 from apps.deliveries.state_machine import DeliveryStateMachine
 from deliverant.celery import app
-
-
-def check_kill_switch():
-    """Check if global kill switch is active."""
-    from django.core.cache import cache
-    return cache.get("deliverant:kill_switch") == "1"
+from workers import kill_switch
 
 
 def generate_signature(secret, timestamp, body):
@@ -77,7 +72,7 @@ def classify_response(response_exception, http_status, headers):
 @app.task
 def execute_delivery(delivery_id):
     """Execute HTTP delivery for a delivery."""
-    if check_kill_switch():
+    if kill_switch.is_active():
         return {"status": "skipped", "reason": "kill_switch_active"}
 
     try:
