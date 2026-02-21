@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-google-sans);
+  --font-mono: var(--font-google-sans-code);
+}
+
+@theme {
+  /* Surface hierarchy — clear steps, not mud */
+  --color-bg: #08080a;
+  --color-surface: #111114;
+  --color-surface-hover: #19191d;
+  --color-elevated: #222228;
+
+  /* Borders — visible but quiet */
+  --color-border: #26262c;
+  --color-border-hover: #35353d;
+
+  /* Accent — emerald signal */
+  --color-accent: #10b981;
+  --color-accent-hover: #34d399;
+  --color-accent-dim: rgba(16, 185, 129, 0.08);
+
+  /* Text — real contrast between levels */
+  --color-text-primary: #ededef;
+  --color-text-secondary: #9394a1;
+  --color-text-muted: #5c5c6a;
+
+  /* Status palette */
+  --color-delivered: #34d399;
+  --color-failed: #fb7185;
+  --color-pending: #fbbf24;
+  --color-scheduled: #60a5fa;
+  --color-in-progress: #a78bfa;
+  --color-expired: #6b6b76;
+  --color-cancelled: #5c5c6a;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+/* Inputs */
+input, select, textarea {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-accent) !important;
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+/* Page entrance */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Staggered children */
+.stagger > * {
+  opacity: 0;
+  animation: fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 40ms; }
+.stagger > *:nth-child(3) { animation-delay: 80ms; }
+.stagger > *:nth-child(4) { animation-delay: 120ms; }
+.stagger > *:nth-child(5) { animation-delay: 160ms; }
+.stagger > *:nth-child(6) { animation-delay: 200ms; }
+
+/* Live indicator pulse */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.pulse { animation: pulse-dot 2s ease-in-out infinite; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-border-hover); }

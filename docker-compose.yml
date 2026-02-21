@@ -83,5 +83,18 @@ services:
       api:
         condition: service_started
 
+  # dashboard:
+  #   build: ./dashboard
+  #   volumes:
+  #     - ./dashboard:/app
+  #     - /app/node_modules
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - API_URL=http://api:8000/v1
+  #   depends_on:
+  #     api:
+  #       condition: service_started
+
 volumes:
   postgres_data:
