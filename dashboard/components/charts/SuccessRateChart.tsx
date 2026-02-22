@@ -11,6 +11,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { SkeletonLine } from "@/components/Skeleton";
 
 interface RatePoint {
   hour: string;
@@ -19,7 +20,7 @@ interface RatePoint {
 }
 
 export function SuccessRateChart() {
-  const { data } = useSWR<RatePoint[]>(
+  const { data, isLoading } = useSWR<RatePoint[]>(
     "/analytics/success-rate?hours=24",
     fetcher,
     { refreshInterval: 30000 }
@@ -36,7 +37,9 @@ export function SuccessRateChart() {
         Success Rate
       </h3>
       <div className="h-56">
-        {formatted.length === 0 ? (
+        {isLoading ? (
+          <SkeletonLine className="h-full w-full rounded-lg" />
+        ) : formatted.length === 0 ? (
           <div className="h-full flex items-center justify-center text-text-muted text-sm">
             No data in the last 24 hours
           </div>
@@ -66,7 +69,7 @@ export function SuccessRateChart() {
                   color: "#ededef",
                 }}
                 labelStyle={{ color: "#9394a1" }}
-                formatter={(value: number) => [`${value}%`, "Success Rate"]}
+                formatter={(value: number | undefined) => [`${value ?? 0}%`, "Success Rate"]}
               />
               <Line
                 type="monotone"

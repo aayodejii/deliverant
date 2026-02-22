@@ -11,6 +11,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { SkeletonLine } from "@/components/Skeleton";
 
 interface VolumePoint {
   hour: string;
@@ -20,7 +21,7 @@ interface VolumePoint {
 }
 
 export function DeliveryVolumeChart() {
-  const { data } = useSWR<VolumePoint[]>(
+  const { data, isLoading } = useSWR<VolumePoint[]>(
     "/analytics/delivery-volume?hours=24",
     fetcher,
     { refreshInterval: 30000 }
@@ -37,7 +38,9 @@ export function DeliveryVolumeChart() {
         Delivery Volume
       </h3>
       <div className="h-56">
-        {formatted.length === 0 ? (
+        {isLoading ? (
+          <SkeletonLine className="h-full w-full rounded-lg" />
+        ) : formatted.length === 0 ? (
           <div className="h-full flex items-center justify-center text-text-muted text-sm">
             No data in the last 24 hours
           </div>

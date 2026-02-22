@@ -11,6 +11,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { SkeletonLine } from "@/components/Skeleton";
 
 interface EndpointHealth {
   endpoint_id: string;
@@ -42,7 +43,7 @@ function HealthTooltip({ active, payload, label }: { active?: boolean; payload?:
 }
 
 export function EndpointHealthChart() {
-  const { data } = useSWR<EndpointHealth[]>(
+  const { data, isLoading } = useSWR<EndpointHealth[]>(
     "/analytics/endpoint-health",
     fetcher,
     { refreshInterval: 30000 }
@@ -59,7 +60,9 @@ export function EndpointHealthChart() {
         Endpoint Health (24h)
       </h3>
       <div className="h-56">
-        {endpoints.length === 0 ? (
+        {isLoading ? (
+          <SkeletonLine className="h-full w-full rounded-lg" />
+        ) : endpoints.length === 0 ? (
           <div className="h-full flex items-center justify-center text-text-muted text-sm">
             No endpoints configured
           </div>

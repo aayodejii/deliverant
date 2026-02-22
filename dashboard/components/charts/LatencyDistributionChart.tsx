@@ -11,6 +11,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { SkeletonLine } from "@/components/Skeleton";
 
 interface LatencyBucket {
   bucket: string;
@@ -18,7 +19,7 @@ interface LatencyBucket {
 }
 
 export function LatencyDistributionChart() {
-  const { data } = useSWR<LatencyBucket[]>(
+  const { data, isLoading } = useSWR<LatencyBucket[]>(
     "/analytics/latency-distribution",
     fetcher,
     { refreshInterval: 30000 }
@@ -30,7 +31,9 @@ export function LatencyDistributionChart() {
         Latency Distribution
       </h3>
       <div className="h-56">
-        {!data || data.every((d) => d.count === 0) ? (
+        {isLoading ? (
+          <SkeletonLine className="h-full w-full rounded-lg" />
+        ) : !data || data.every((d) => d.count === 0) ? (
           <div className="h-full flex items-center justify-center text-text-muted text-sm">
             No latency data in the last 24 hours
           </div>
@@ -59,7 +62,7 @@ export function LatencyDistributionChart() {
                   color: "#ededef",
                 }}
                 labelStyle={{ color: "#9394a1" }}
-                formatter={(value: number) => [value, "Attempts"]}
+                formatter={(value: number | undefined) => [value ?? 0, "Attempts"]}
               />
               <Bar
                 dataKey="count"
