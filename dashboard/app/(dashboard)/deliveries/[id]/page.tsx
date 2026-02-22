@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { LuBan, LuClock, LuTriangleAlert } from "react-icons/lu";
 import { SkeletonDetailGrid, SkeletonLine } from "@/components/Skeleton";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { CountdownTimer } from "@/components/CountdownTimer";
 
 export default function DeliveryDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -98,9 +99,13 @@ export default function DeliveryDetailPage() {
       {delivery.next_attempt_at && (
         <div className="flex items-center gap-3 bg-pending/10 border border-pending/20 rounded-lg px-4 py-3">
           <LuClock size={15} className="text-pending shrink-0" />
-          <p className="text-sm text-pending">
-            Next attempt: <span className="font-mono">{new Date(delivery.next_attempt_at).toLocaleString()}</span>
-          </p>
+          <div className="text-sm text-pending">
+            <span>Next attempt in </span>
+            <CountdownTimer targetDate={delivery.next_attempt_at} />
+            <span className="text-pending/60 ml-2">
+              ({new Date(delivery.next_attempt_at).toLocaleString()})
+            </span>
+          </div>
         </div>
       )}
 
