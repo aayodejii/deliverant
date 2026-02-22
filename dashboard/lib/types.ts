@@ -71,6 +71,21 @@ export interface PaginatedResponse<T> {
   next_cursor: string | null;
 }
 
+export interface TenantAPIKey {
+  id: string;
+  name: string;
+  status: "ACTIVE" | "REVOKED";
+  created_at: string;
+  last_used_at: string | null;
+}
+
+export interface TenantInfo {
+  id: string;
+  name: string;
+  created_at: string;
+  api_keys: TenantAPIKey[];
+}
+
 export interface DeliveryBatch {
   id: string;
   type: string;
