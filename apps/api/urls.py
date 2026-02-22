@@ -9,7 +9,9 @@ from apps.api.views.analytics import (
 from apps.api.views.deliveries import DeliveryListView, DeliveryDetailView, DeliveryCancelView
 from apps.api.views.endpoints import EndpointListCreateView, EndpointDetailView
 from apps.api.views.events import EventCreateView
+from apps.api.views.kill_switch import KillSwitchView
 from apps.api.views.replays import ReplayCreateView
+from apps.api.views.tenant import TenantInfoView
 
 urlpatterns = [
     path("endpoints", EndpointListCreateView.as_view(), name="endpoint-list"),
@@ -23,4 +25,6 @@ urlpatterns = [
     path("analytics/success-rate", SuccessRateView.as_view(), name="analytics-success-rate"),
     path("analytics/latency-distribution", LatencyDistributionView.as_view(), name="analytics-latency-distribution"),
     path("analytics/endpoint-health", EndpointHealthView.as_view(), name="analytics-endpoint-health"),
+    path("kill-switch", KillSwitchView.as_view(), name="kill-switch"),
+    path("tenant", TenantInfoView.as_view(), name="tenant-info"),
 ]
