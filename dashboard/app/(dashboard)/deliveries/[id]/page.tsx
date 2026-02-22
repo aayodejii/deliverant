@@ -8,7 +8,9 @@ import { DeliveryStatusBadge } from "@/components/DeliveryStatusBadge";
 import { AttemptTimeline } from "@/components/AttemptTimeline";
 import { useState } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
 import { LuArrowLeft, LuBan, LuClock, LuTriangleAlert } from "react-icons/lu";
+import { SkeletonDetailGrid, SkeletonLine } from "@/components/Skeleton";
 
 export default function DeliveryDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,7 +20,22 @@ export default function DeliveryDetailPage() {
   const [cancelling, setCancelling] = useState(false);
 
   if (!delivery) {
-    return <p className="text-text-muted py-12 text-center text-sm">Loading...</p>;
+    return (
+      <div className="space-y-6">
+        <div>
+          <SkeletonLine className="h-4 w-32 mb-3" />
+          <SkeletonLine className="h-6 w-24 mb-1" />
+          <SkeletonLine className="h-4 w-64" />
+        </div>
+        <SkeletonDetailGrid />
+        <div>
+          <SkeletonLine className="h-3 w-20 mb-4" />
+          <div className="bg-surface border border-border rounded-xl p-5">
+            <SkeletonLine className="h-40 w-full rounded-lg" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const canCancel = ["PENDING", "SCHEDULED", "IN_PROGRESS"].includes(delivery.status);
@@ -28,6 +45,9 @@ export default function DeliveryDetailPage() {
     try {
       await apiFetch(`/deliveries/${id}/cancel`, { method: "POST" });
       await mutate();
+      toast.success("Delivery cancelled");
+    } catch {
+      toast.error("Failed to cancel delivery");
     } finally {
       setCancelling(false);
     }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { apiFetch } from "@/lib/api";
+import { toast } from "sonner";
 import { LuRotateCcw, LuCircleCheck, LuInfo } from "react-icons/lu";
 
 interface ReplayResult {
@@ -40,8 +41,15 @@ export default function ReplaysPage() {
         body: JSON.stringify({ delivery_ids: ids, dry_run: dryRun }),
       });
       setResult(data);
+      if (data.dry_run) {
+        toast.success(`Dry run complete — ${data.created_deliveries} deliveries would be created`);
+      } else {
+        toast.success(`Replay created — ${data.created_deliveries} deliveries queued`);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create replay");
+      const message = err instanceof Error ? err.message : "Failed to create replay";
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

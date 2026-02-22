@@ -8,11 +8,13 @@ import { DeliveryStatusBadge } from "@/components/DeliveryStatusBadge";
 import { DeliveryVolumeChart } from "@/components/charts/DeliveryVolumeChart";
 import { SuccessRateChart } from "@/components/charts/SuccessRateChart";
 import { LatencyDistributionChart } from "@/components/charts/LatencyDistributionChart";
+import { SkeletonCard, SkeletonChart, SkeletonTable } from "@/components/Skeleton";
+import { EmptyState } from "@/components/EmptyState";
 import Link from "next/link";
 import { LuArrowUpRight } from "react-icons/lu";
 
 export default function DashboardPage() {
-  const { data: deliveries } = useSWR<Delivery[]>("/deliveries", fetcher, { refreshInterval: 5000 });
+  const { data: deliveries, isLoading: loadingDeliveries } = useSWR<Delivery[]>("/deliveries", fetcher, { refreshInterval: 5000 });
   const { data: endpoints } = useSWR<Endpoint[]>("/endpoints", fetcher, { refreshInterval: 10000 });
 
   const total = deliveries?.length ?? 0;
@@ -30,12 +32,18 @@ export default function DashboardPage() {
         <p className="text-text-muted mt-0.5">Webhook delivery metrics and recent activity</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 stagger">
-        <MetricsCard label="Total Deliveries" value={total} />
-        <MetricsCard label="Success Rate" value={`${successRate}%`} sub={`${delivered} delivered`} />
-        <MetricsCard label="Failed" value={failed} />
-        <MetricsCard label="In Progress" value={pending} sub={`${endpoints?.length ?? 0} endpoints`} />
-      </div>
+      {loadingDeliveries ? (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 stagger">
+          <MetricsCard label="Total Deliveries" value={total} />
+          <MetricsCard label="Success Rate" value={`${successRate}%`} sub={`${delivered} delivered`} />
+          <MetricsCard label="Failed" value={failed} />
+          <MetricsCard label="In Progress" value={pending} sub={`${endpoints?.length ?? 0} endpoints`} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <DeliveryVolumeChart />
@@ -52,39 +60,45 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="bg-surface border border-border rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border">
-                <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Event</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Endpoint</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Attempts</th>
-                <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Created</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {recent.map((d) => (
-                <tr key={d.id} className="hover:bg-surface-hover transition-colors">
-                  <td className="px-4 py-3">
-                    <Link href={`/deliveries/${d.id}`} className="text-text-primary hover:text-accent transition-colors font-mono text-sm">
-                      {d.event_type}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-text-secondary text-sm">{d.endpoint_name}</td>
-                  <td className="px-4 py-3"><DeliveryStatusBadge status={d.status} /></td>
-                  <td className="px-4 py-3 text-text-secondary font-mono text-sm">{d.attempts_count}</td>
-                  <td className="px-4 py-3 text-text-muted font-mono text-sm">{new Date(d.created_at).toLocaleString()}</td>
+        {loadingDeliveries ? (
+          <SkeletonTable rows={5} cols={5} />
+        ) : (
+          <div className="bg-surface border border-border rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Event</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Endpoint</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Status</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Attempts</th>
+                  <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Created</th>
                 </tr>
-              ))}
-              {recent.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-text-muted text-sm">No deliveries yet</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {recent.map((d) => (
+                  <tr key={d.id} className="hover:bg-surface-hover transition-colors">
+                    <td className="px-4 py-3">
+                      <Link href={`/deliveries/${d.id}`} className="text-text-primary hover:text-accent transition-colors font-mono text-sm">
+                        {d.event_type}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-text-secondary text-sm">{d.endpoint_name}</td>
+                    <td className="px-4 py-3"><DeliveryStatusBadge status={d.status} /></td>
+                    <td className="px-4 py-3 text-text-secondary font-mono text-sm">{d.attempts_count}</td>
+                    <td className="px-4 py-3 text-text-muted font-mono text-sm">{new Date(d.created_at).toLocaleString()}</td>
+                  </tr>
+                ))}
+                {recent.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="p-0">
+                      <EmptyState preset="deliveries" />
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
