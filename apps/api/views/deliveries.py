@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.db.models import Q
 from django.utils.dateparse import parse_datetime
 from rest_framework import status
 from rest_framework.response import Response
@@ -31,6 +32,12 @@ class DeliveryListView(APIView):
         event_id = request.query_params.get("event_id")
         if event_id:
             queryset = queryset.filter(event_id=event_id)
+
+        search = request.query_params.get("search")
+        if search:
+            queryset = queryset.filter(
+                Q(event__type__icontains=search) | Q(endpoint__name__icontains=search)
+            )
 
         cursor = request.query_params.get("cursor")
         if cursor:

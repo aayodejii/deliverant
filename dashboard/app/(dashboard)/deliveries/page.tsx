@@ -32,6 +32,7 @@ export default function DeliveriesPage() {
   const params = new URLSearchParams();
   if (statusFilter) params.set("status", statusFilter);
   if (endpointFilter) params.set("endpoint_id", endpointFilter);
+  if (search) params.set("search", search);
   const qs = params.toString();
 
   const { data, isLoading } = useSWR<PaginatedResponse<Delivery>>(
@@ -47,15 +48,7 @@ export default function DeliveriesPage() {
   );
   const { data: endpoints } = useSWR<Endpoint[]>("/endpoints", fetcher);
 
-  const allDeliveries = [...(data?.results ?? []), ...extraPages];
-
-  const filtered = search
-    ? allDeliveries.filter(
-        (d) =>
-          d.event_type.toLowerCase().includes(search.toLowerCase()) ||
-          d.endpoint_name.toLowerCase().includes(search.toLowerCase())
-      )
-    : allDeliveries;
+  const filtered = [...(data?.results ?? []), ...extraPages];
 
   const hasMore = nextCursor !== null;
 
