@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import useSWR from "swr";
 import { fetcher, apiFetch } from "@/lib/api";
 import type { Delivery, Endpoint, PaginatedResponse } from "@/lib/types";
@@ -28,6 +28,18 @@ export default function DeliveriesPage() {
   const [extraPages, setExtraPages] = useState<Delivery[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "/" && !e.metaKey && !e.ctrlKey && document.activeElement?.tagName !== "INPUT") {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const params = new URLSearchParams();
   if (statusFilter) params.set("status", statusFilter);
@@ -87,9 +99,10 @@ export default function DeliveriesPage() {
             className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
           />
           <input
+            ref={searchRef}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search events or endpoints..."
+            placeholder="Search events or endpoints... ( / )"
             className="w-full pl-9 pr-3 py-2 bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-muted"
           />
         </div>
@@ -138,8 +151,8 @@ export default function DeliveriesPage() {
           </div>
         )
       ) : (
-        <div className="bg-surface border border-border rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="bg-surface border border-border rounded-xl overflow-x-auto">
+          <table className="w-full text-sm min-w-[700px]">
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">
