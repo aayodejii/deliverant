@@ -64,8 +64,8 @@ export default function DashboardPage() {
         {loadingDeliveries ? (
           <SkeletonTable rows={5} cols={5} />
         ) : (
-          <div className="bg-surface border border-border rounded-xl overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="bg-surface border border-border rounded-xl overflow-x-auto">
+            <table className="w-full text-sm min-w-[600px]">
               <thead>
                 <tr className="border-b border-border">
                   <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">Event</th>

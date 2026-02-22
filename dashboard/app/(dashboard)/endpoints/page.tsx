@@ -182,7 +182,7 @@ export default function EndpointsPage() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex items-end justify-between">
         <div>
           <h1 className="text-xl font-semibold text-text-primary">Endpoints</h1>
           <p className="text-text-muted mt-0.5">
@@ -194,7 +194,7 @@ export default function EndpointsPage() {
           className="flex items-center gap-2 px-4 py-2 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover transition-colors cursor-pointer"
         >
           <LuPlus size={15} />
-          Create Endpoint
+          Endpoint
         </button>
       </div>
 
@@ -218,8 +218,8 @@ export default function EndpointsPage() {
           <EmptyState preset="endpoints" onAction={() => setShowCreate(true)} />
         </div>
       ) : (
-        <div className="bg-surface border border-border rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="bg-surface border border-border rounded-xl overflow-x-auto">
+          <table className="w-full text-sm min-w-[600px]">
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left px-4 py-3 text-sm font-medium text-text-muted">
