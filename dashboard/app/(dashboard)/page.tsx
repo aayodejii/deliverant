@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import { fetcher } from "@/lib/api";
-import type { Delivery, Endpoint } from "@/lib/types";
+import type { Delivery, Endpoint, PaginatedResponse } from "@/lib/types";
 import { MetricsCard } from "@/components/MetricsCard";
 import { DeliveryStatusBadge } from "@/components/DeliveryStatusBadge";
 import { DeliveryVolumeChart } from "@/components/charts/DeliveryVolumeChart";
@@ -14,7 +14,8 @@ import Link from "next/link";
 import { LuArrowUpRight } from "react-icons/lu";
 
 export default function DashboardPage() {
-  const { data: deliveries, isLoading: loadingDeliveries } = useSWR<Delivery[]>("/deliveries", fetcher, { refreshInterval: 5000 });
+  const { data: deliveriesData, isLoading: loadingDeliveries } = useSWR<PaginatedResponse<Delivery>>("/deliveries", fetcher, { refreshInterval: 5000 });
+  const deliveries = deliveriesData?.results;
   const { data: endpoints } = useSWR<Endpoint[]>("/endpoints", fetcher, { refreshInterval: 10000 });
 
   const total = deliveries?.length ?? 0;

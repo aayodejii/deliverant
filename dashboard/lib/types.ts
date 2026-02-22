@@ -65,6 +65,12 @@ export interface Event {
   created_at: string;
 }
 
+export interface PaginatedResponse<T> {
+  results: T[];
+  has_more: boolean;
+  next_cursor: string | null;
+}
+
 export interface DeliveryBatch {
   id: string;
   type: string;
