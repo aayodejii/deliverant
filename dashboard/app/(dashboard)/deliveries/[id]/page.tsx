@@ -7,10 +7,10 @@ import type { DeliveryDetail } from "@/lib/types";
 import { DeliveryStatusBadge } from "@/components/DeliveryStatusBadge";
 import { AttemptTimeline } from "@/components/AttemptTimeline";
 import { useState } from "react";
-import Link from "next/link";
 import { toast } from "sonner";
-import { LuArrowLeft, LuBan, LuClock, LuTriangleAlert } from "react-icons/lu";
+import { LuBan, LuClock, LuTriangleAlert } from "react-icons/lu";
 import { SkeletonDetailGrid, SkeletonLine } from "@/components/Skeleton";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 
 export default function DeliveryDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -64,24 +64,26 @@ export default function DeliveryDetailPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <div>
-          <Link href="/deliveries" className="inline-flex items-center gap-1.5 text-sm text-text-muted hover:text-text-secondary transition-colors mb-3">
-            <LuArrowLeft size={14} /> Back to deliveries
-          </Link>
+      <div>
+        <Breadcrumbs
+          items={[
+            { label: "Deliveries", href: "/deliveries" },
+            { label: delivery.id },
+          ]}
+        />
+        <div className="flex items-center justify-between gap-4">
           <h1 className="text-xl font-semibold text-text-primary">Delivery</h1>
-          <p className="text-sm text-text-muted mt-0.5 font-mono">{delivery.id}</p>
+          {canCancel && (
+            <button
+              onClick={handleCancel}
+              disabled={cancelling}
+              className="flex items-center gap-2 px-4 py-2 bg-failed/10 text-failed border border-failed/20 text-sm font-medium rounded-lg hover:bg-failed/15 disabled:opacity-50 transition-colors shrink-0 cursor-pointer"
+            >
+              <LuBan size={14} />
+              {cancelling ? "Cancelling..." : "Cancel Delivery"}
+            </button>
+          )}
         </div>
-        {canCancel && (
-          <button
-            onClick={handleCancel}
-            disabled={cancelling}
-            className="flex items-center gap-2 px-4 py-2 bg-failed/10 text-failed border border-failed/20 text-sm font-medium rounded-lg hover:bg-failed/15 disabled:opacity-50 transition-colors"
-          >
-            <LuBan size={14} />
-            {cancelling ? "Cancelling..." : "Cancel Delivery"}
-          </button>
-        )}
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 stagger">
