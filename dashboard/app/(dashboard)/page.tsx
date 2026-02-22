@@ -5,6 +5,9 @@ import { fetcher } from "@/lib/api";
 import type { Delivery, Endpoint } from "@/lib/types";
 import { MetricsCard } from "@/components/MetricsCard";
 import { DeliveryStatusBadge } from "@/components/DeliveryStatusBadge";
+import { DeliveryVolumeChart } from "@/components/charts/DeliveryVolumeChart";
+import { SuccessRateChart } from "@/components/charts/SuccessRateChart";
+import { LatencyDistributionChart } from "@/components/charts/LatencyDistributionChart";
 import Link from "next/link";
 import { LuArrowUpRight } from "react-icons/lu";
 
@@ -33,6 +36,13 @@ export default function DashboardPage() {
         <MetricsCard label="Failed" value={failed} />
         <MetricsCard label="In Progress" value={pending} sub={`${endpoints?.length ?? 0} endpoints`} />
       </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <DeliveryVolumeChart />
+        <SuccessRateChart />
+      </div>
+
+      <LatencyDistributionChart />
 
       <div>
         <div className="flex items-center justify-between mb-3">

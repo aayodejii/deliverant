@@ -5,6 +5,7 @@ import useSWR from "swr";
 import { apiFetch, fetcher } from "@/lib/api";
 import type { Endpoint } from "@/lib/types";
 import { LuPlus, LuPencil, LuPause, LuPlay } from "react-icons/lu";
+import { EndpointHealthChart } from "@/components/charts/EndpointHealthChart";
 
 function EndpointForm({
   initial,
@@ -199,6 +200,8 @@ export default function EndpointsPage() {
           </tbody>
         </table>
       </div>
+
+      <EndpointHealthChart />
     </div>
   );
 }
