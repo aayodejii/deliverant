@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from django.utils.dateparse import parse_datetime
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,6 +9,8 @@ from apps.api.authentication import APIKeyAuthentication, IsAPIKeyAuthenticated
 from apps.api.serializers.deliveries import DeliverySerializer, DeliveryDetailSerializer
 from apps.deliveries.models import Delivery
 from apps.deliveries.state_machine import DeliveryStateMachine
+
+PAGE_SIZE = 20
 
 
 class DeliveryListView(APIView):
@@ -27,10 +32,29 @@ class DeliveryListView(APIView):
         if event_id:
             queryset = queryset.filter(event_id=event_id)
 
-        queryset = queryset.order_by("-created_at")[:100]
+        cursor = request.query_params.get("cursor")
+        if cursor:
+            cursor_dt = parse_datetime(cursor)
+            if cursor_dt:
+                queryset = queryset.filter(created_at__lt=cursor_dt)
 
-        serializer = DeliverySerializer(queryset, many=True)
-        return Response(serializer.data)
+        limit = min(int(request.query_params.get("limit", PAGE_SIZE)), 100)
+        queryset = queryset.order_by("-created_at")[: limit + 1]
+        results = list(queryset)
+
+        has_more = len(results) > limit
+        if has_more:
+            results = results[:limit]
+
+        serializer = DeliverySerializer(results, many=True)
+
+        response_data = {
+            "results": serializer.data,
+            "has_more": has_more,
+            "next_cursor": results[-1].created_at.isoformat() if has_more and results else None,
+        }
+
+        return Response(response_data)
 
 
 class DeliveryDetailView(APIView):
