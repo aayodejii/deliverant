@@ -30,6 +30,7 @@ services:
     command: gunicorn deliverant.wsgi:application --bind 0.0.0.0:8000 --reload
     volumes:
       - .:/app
+      - prometheus_data:/tmp/prometheus_multiproc
     ports:
       - "8000:8000"
     environment:
@@ -41,6 +42,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - UV_LINK_MODE=copy
+      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_multiproc
     depends_on:
       postgres:
         condition: service_healthy
@@ -52,6 +55,7 @@ services:
     command: celery -A deliverant worker -l info
     volumes:
       - .:/app
+      - prometheus_data:/tmp/prometheus_multiproc
     environment:
       - DJANGO_SETTINGS_MODULE=deliverant.settings.development
       - DB_HOST=postgres
@@ -61,6 +65,8 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - UV_LINK_MODE=copy
+      - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_multiproc
     depends_on:
       api:
         condition: service_started
@@ -79,6 +85,7 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - UV_LINK_MODE=copy
     depends_on:
       api:
         condition: service_started
@@ -98,3 +105,4 @@ services:
 
 volumes:
   postgres_data:
+  prometheus_data:

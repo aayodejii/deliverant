@@ -1,9 +1,15 @@
+import os
+
 import environ
 from pathlib import Path
 
 env = environ.Env()
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+prometheus_dir = os.environ.get("PROMETHEUS_MULTIPROC_DIR")
+if prometheus_dir:
+    Path(prometheus_dir).mkdir(parents=True, exist_ok=True)
 
 SECRET_KEY = env("SECRET_KEY", default="django-insecure-change-me-in-production")
 
@@ -15,6 +21,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "django_prometheus",
     "apps.tenants",
     "apps.endpoints",
     "apps.events",
@@ -25,6 +32,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -32,9 +40,11 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
 ROOT_URLCONF = "deliverant.urls"
+APPEND_SLASH = False
 
 TEMPLATES = [
     {
@@ -109,3 +119,37 @@ LEASE_RECOVERY_DELAY_SECONDS = 30
 DEDUP_WINDOW_HOURS = 72
 MAX_ENDPOINT_CONCURRENCY = 10
 MAX_REPLAY_BATCH_SIZE = 1000
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "json": {
+            "()": "pythonjsonlogger.json.JsonFormatter",
+            "format": "%(asctime)s %(name)s %(levelname)s %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "json",
+        },
+    },
+    "loggers": {
+        "workers": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "apps": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+    },
+}
