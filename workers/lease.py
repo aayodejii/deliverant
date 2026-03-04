@@ -1,3 +1,5 @@
+import logging
+
 from django.db import transaction
 from django.utils import timezone
 
@@ -5,6 +7,8 @@ from apps.attempts.models import Attempt
 from apps.deliveries.models import Delivery
 from apps.deliveries.state_machine import DeliveryStateMachine
 from deliverant.celery import app
+
+logger = logging.getLogger("workers.lease")
 
 
 @app.task
@@ -48,7 +52,19 @@ def recover_expired_leases():
                 DeliveryStateMachine.recover_lease(delivery)
                 recovered_count += 1
 
+                logger.warning("Recovered expired lease", extra={
+                    "delivery_id": str(delivery.id),
+                    "tenant_id": str(delivery.tenant_id),
+                    "attempt_number": attempt_number,
+                })
+
         except Exception as e:
-            print(f"Error recovering delivery {delivery.id}: {e}")
+            logger.error("Error recovering delivery", extra={
+                "delivery_id": str(delivery.id),
+                "error": str(e),
+            })
+
+    if recovered_count > 0:
+        logger.info("Lease recovery completed", extra={"recovered": recovered_count})
 
     return {"recovered": recovered_count}

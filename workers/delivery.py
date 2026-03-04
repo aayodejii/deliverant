@@ -1,10 +1,8 @@
 import hashlib
 import hmac
 import httpx
-import json
-from datetime import timedelta
+import logging
 
-from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 
@@ -13,6 +11,9 @@ from apps.deliveries.models import Delivery
 from apps.deliveries.state_machine import DeliveryStateMachine
 from deliverant.celery import app
 from workers import kill_switch
+from workers.metrics import attempts_executed_total, attempt_latency_seconds, delivery_latency_seconds
+
+logger = logging.getLogger("workers.delivery")
 
 
 def generate_signature(secret, timestamp, body):
@@ -29,7 +30,7 @@ def generate_signature(secret, timestamp, body):
     return f"v1={signature}"
 
 
-def classify_response(response_exception, http_status, headers):
+def classify_response(response_exception, http_status):
     """Classify HTTP response into outcome and classification."""
     if response_exception:
         error_type = type(response_exception).__name__
@@ -73,6 +74,7 @@ def classify_response(response_exception, http_status, headers):
 def execute_delivery(delivery_id):
     """Execute HTTP delivery for a delivery."""
     if kill_switch.is_active():
+        logger.info("Delivery skipped due to kill switch", extra={"delivery_id": delivery_id})
         return {"status": "skipped", "reason": "kill_switch_active"}
 
     try:
@@ -82,13 +84,19 @@ def execute_delivery(delivery_id):
             ).get(id=delivery_id)
 
             if delivery.status != Delivery.Status.SCHEDULED:
+                logger.info("Delivery skipped", extra={
+                    "delivery_id": delivery_id,
+                    "reason": f"delivery_status_{delivery.status}",
+                })
                 return {"status": "skipped", "reason": f"delivery_status_{delivery.status}"}
 
             delivery = DeliveryStateMachine.acquire_lease(delivery)
 
     except Delivery.DoesNotExist:
+        logger.warning("Delivery not found", extra={"delivery_id": delivery_id})
         return {"status": "error", "reason": "delivery_not_found"}
     except Exception as e:
+        logger.error("Failed to acquire lease", extra={"delivery_id": delivery_id, "error": str(e)})
         return {"status": "error", "reason": str(e)}
 
     attempt_number = delivery.attempts_count + 1
@@ -143,7 +151,7 @@ def execute_delivery(delivery_id):
         ended_at = timezone.now()
         latency_ms = int((ended_at - started_at).total_seconds() * 1000)
 
-    outcome, classification = classify_response(response_exception, http_status, response_headers)
+    outcome, classification = classify_response(response_exception, http_status)
 
     payload_hash = delivery.event.payload_hash
     error_detail = str(response_exception) if response_exception else None
@@ -164,15 +172,37 @@ def execute_delivery(delivery_id):
         request_payload_hash=payload_hash,
     )
 
+    attempts_executed_total.labels(
+        outcome=outcome or "unknown",
+        classification=classification or "none",
+    ).inc()
+    if latency_ms is not None:
+        attempt_latency_seconds.observe(latency_ms / 1000)
+
     with transaction.atomic():
         delivery = Delivery.objects.select_for_update().get(id=delivery_id)
 
         if outcome == Attempt.Outcome.SUCCESS:
             DeliveryStateMachine.complete_success(delivery)
+            total_seconds = (timezone.now() - delivery.created_at).total_seconds()
+            delivery_latency_seconds.observe(total_seconds)
         elif outcome == Attempt.Outcome.NON_RETRYABLE_FAILURE:
             DeliveryStateMachine.complete_non_retryable(delivery, f"{classification}: {error_detail or http_status}")
+            total_seconds = (timezone.now() - delivery.created_at).total_seconds()
+            delivery_latency_seconds.observe(total_seconds)
         else:
             DeliveryStateMachine.complete_retryable(delivery, attempt_number)
+
+    logger.info("Delivery attempt completed", extra={
+        "delivery_id": str(delivery.id),
+        "attempt_id": str(attempt.id),
+        "tenant_id": str(delivery.tenant_id),
+        "attempt_number": attempt_number,
+        "outcome": outcome,
+        "classification": classification,
+        "http_status": http_status,
+        "latency_ms": latency_ms,
+    })
 
     return {
         "status": "completed",

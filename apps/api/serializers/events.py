@@ -9,6 +9,7 @@ from rest_framework import serializers
 from apps.deliveries.models import Delivery
 from apps.endpoints.models import Endpoint
 from apps.events.models import Event
+from workers.metrics import deliveries_created_total
 
 
 class EventCreateSerializer(serializers.Serializer):
@@ -98,6 +99,10 @@ class EventCreateSerializer(serializers.Serializer):
                     status=Delivery.Status.PENDING,
                 )
                 created = True
+                deliveries_created_total.labels(
+                    tenant_id=str(tenant.id),
+                    mode=mode,
+                ).inc()
 
             deliveries.append({"delivery": delivery, "created": created})
 
