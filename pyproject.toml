@@ -23,3 +23,11 @@ dev = [
     "pytest-cov>=7.0.0",
     "pytest-django>=4.11.1",
 ]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "deliverant.settings.development"
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
