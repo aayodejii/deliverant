@@ -1,16 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { LuZap, LuArrowRight } from "react-icons/lu";
+import { useRouter, useSearchParams } from "next/navigation";
+import { LuZap, LuArrowRight, LuChevronDown } from "react-icons/lu";
+import { FaGoogle, FaGithub } from "react-icons/fa";
 
 export default function LoginPage() {
   const [apiKey, setApiKey] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const oauthError = searchParams.get("error");
+
+  const handleApiKeySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
@@ -49,41 +54,79 @@ export default function LoginPage() {
           <p className="text-sm text-text-muted mt-1">Webhook reliability platform</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-surface border border-border rounded-xl p-6 space-y-5">
+        <div className="bg-surface border border-border rounded-xl p-6 space-y-5">
           <div>
             <h2 className="text-base font-semibold text-text-primary">Sign in</h2>
-            <p className="text-sm text-text-muted mt-1">Enter your API key to continue</p>
+            <p className="text-sm text-text-muted mt-1">Continue with your account</p>
           </div>
 
-          <div>
-            <label htmlFor="apiKey" className="block text-sm text-text-muted mb-1.5">API Key</label>
-            <input
-              id="apiKey"
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder="sk_live_..."
-              className="w-full px-3 py-2.5 bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-muted font-mono"
-              required
-            />
-          </div>
-
-          {error && (
+          {(oauthError || error) && (
             <div className="bg-failed/10 border border-failed/20 rounded-lg px-3 py-2">
-              <p className="text-sm text-failed">{error}</p>
+              <p className="text-sm text-failed">
+                {error || "Authentication failed. Please try again."}
+              </p>
             </div>
           )}
 
+          <div className="space-y-3">
+            <a
+              href="/api/auth/authorize/google"
+              className="w-full flex items-center justify-center gap-3 py-2.5 bg-elevated border border-border rounded-lg text-sm text-text-primary hover:bg-border/50 transition-colors"
+            >
+              <FaGoogle size={16} />
+              Continue with Google
+            </a>
+            <a
+              href="/api/auth/authorize/github"
+              className="w-full flex items-center justify-center gap-3 py-2.5 bg-elevated border border-border rounded-lg text-sm text-text-primary hover:bg-border/50 transition-colors"
+            >
+              <FaGithub size={16} />
+              Continue with GitHub
+            </a>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-xs text-text-muted">or</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+
           <button
-            type="submit"
-            disabled={loading}
-            className="group w-full flex items-center justify-center gap-2 py-2.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover disabled:opacity-50 transition-colors"
+            type="button"
+            onClick={() => setShowApiKey(!showApiKey)}
+            className="w-full flex items-center justify-center gap-1.5 text-sm text-text-muted hover:text-text-primary transition-colors"
           >
-            {loading ? "Authenticating..." : (
-              <>Continue <LuArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" /></>
-            )}
+            Sign in with API key
+            <LuChevronDown size={14} className={`transition-transform ${showApiKey ? "rotate-180" : ""}`} />
           </button>
-        </form>
+
+          {showApiKey && (
+            <form onSubmit={handleApiKeySubmit} className="space-y-4">
+              <div>
+                <label htmlFor="apiKey" className="block text-sm text-text-muted mb-1.5">API Key</label>
+                <input
+                  id="apiKey"
+                  type="password"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="sk_live_..."
+                  className="w-full px-3 py-2.5 bg-elevated border border-border rounded-lg text-sm text-text-primary placeholder:text-text-muted font-mono"
+                  required
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="group w-full flex items-center justify-center gap-2 py-2.5 bg-accent text-white text-sm font-medium rounded-lg hover:bg-accent-hover disabled:opacity-50 transition-colors"
+              >
+                {loading ? "Authenticating..." : (
+                  <>Continue <LuArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" /></>
+                )}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
