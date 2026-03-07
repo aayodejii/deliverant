@@ -64,7 +64,9 @@ TEMPLATES = [
 WSGI_APPLICATION = "deliverant.wsgi.application"
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -108,6 +110,8 @@ CACHES = {
         "LOCATION": REDIS_URL,
     }
 }
+
+INTERNAL_API_SECRET = env("INTERNAL_API_SECRET", default="")
 
 MAX_PAYLOAD_SIZE = 256 * 1024  # 256 KB
 DEFAULT_RETENTION_DAYS = 30

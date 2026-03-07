@@ -44,6 +44,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - UV_LINK_MODE=copy
       - PROMETHEUS_MULTIPROC_DIR=/tmp/prometheus_multiproc
+      - INTERNAL_API_SECRET=${INTERNAL_API_SECRET:-dev-internal-secret}
     depends_on:
       postgres:
         condition: service_healthy

@@ -10,6 +10,7 @@ from apps.api.views.deliveries import DeliveryListView, DeliveryDetailView, Deli
 from apps.api.views.endpoints import EndpointListCreateView, EndpointDetailView
 from apps.api.views.events import EventCreateView
 from apps.api.views.kill_switch import KillSwitchView
+from apps.api.views.oauth import OAuthProvisionView, RevokeSessionView
 from apps.api.views.replays import ReplayCreateView
 from apps.api.views.tenant import TenantInfoView
 
@@ -27,4 +28,6 @@ urlpatterns = [
     path("analytics/endpoint-health", EndpointHealthView.as_view(), name="analytics-endpoint-health"),
     path("kill-switch", KillSwitchView.as_view(), name="kill-switch"),
     path("tenant", TenantInfoView.as_view(), name="tenant-info"),
+    path("auth/oauth-provision", OAuthProvisionView.as_view(), name="oauth-provision"),
+    path("auth/revoke-session", RevokeSessionView.as_view(), name="revoke-session"),
 ]
