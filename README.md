@@ -104,4 +104,4 @@ Every feature is evaluated against this principle.
 
 ## License
 
-License to be defined.
+[AGPL-3.0](LICENSE)
