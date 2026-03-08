@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     const { api_key } = await provisionRes.json();
     await setSession(api_key);
 
-    return Response.redirect(new URL("/", request.url));
+    return Response.redirect(new URL("/dashboard", request.url));
   } catch {
     return Response.redirect(new URL("/login?error=oauth_failed", request.url));
   }

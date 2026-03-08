@@ -28,7 +28,7 @@ export function CommandPalette() {
   const router = useRouter();
 
   const commands: Command[] = [
-    { id: "overview", label: "Go to Overview", icon: LuLayoutDashboard, action: () => router.push("/"), section: "Navigation" },
+    { id: "overview", label: "Go to Overview", icon: LuLayoutDashboard, action: () => router.push("/dashboard"), section: "Navigation" },
     { id: "endpoints", label: "Go to Endpoints", icon: LuPlug, action: () => router.push("/endpoints"), section: "Navigation" },
     { id: "deliveries", label: "Go to Deliveries", icon: LuPackage, action: () => router.push("/deliveries"), section: "Navigation" },
     { id: "replays", label: "Go to Replays", icon: LuRotateCcw, action: () => router.push("/replays"), section: "Navigation" },

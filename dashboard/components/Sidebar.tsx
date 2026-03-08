@@ -20,7 +20,7 @@ import {
 import type { IconType } from "react-icons";
 
 const navItems: { href: string; label: string; icon: IconType }[] = [
-  { href: "/", label: "Overview", icon: LuLayoutDashboard },
+  { href: "/dashboard", label: "Overview", icon: LuLayoutDashboard },
   { href: "/endpoints", label: "Endpoints", icon: LuPlug },
   { href: "/deliveries", label: "Deliveries", icon: LuPackage },
   { href: "/replays", label: "Replays", icon: LuRotateCcw },
@@ -91,8 +91,7 @@ export function Sidebar() {
         <nav className="flex-1 px-3 space-y-px">
           {navItems.map((item) => {
             const isActive =
-              pathname === item.href ||
-              (item.href !== "/" && pathname.startsWith(item.href));
+              pathname === item.href || pathname.startsWith(item.href);
             const Icon = item.icon;
             return (
               <Link
@@ -148,8 +147,7 @@ export function Sidebar() {
         <nav className="flex items-center justify-around px-2 py-1">
           {mobileTabItems.map((item) => {
             const isActive =
-              pathname === item.href ||
-              (item.href !== "/" && pathname.startsWith(item.href));
+              pathname === item.href || pathname.startsWith(item.href);
             const Icon = item.icon;
             return (
               <Link
