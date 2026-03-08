@@ -4,6 +4,20 @@ Base URL: `http://localhost:8000/v1`
 
 All endpoints (except health and OAuth provision) require authentication via `Authorization: Bearer <api_key>`.
 
+## ID Format
+
+All resource IDs use a prefixed format for easy identification:
+
+| Resource | Prefix | Example |
+|---|---|---|
+| Event | `evt_` | `evt_550e8400-e29b-41d4-a716-446655440000` |
+| Delivery | `del_` | `del_6ba7b810-9dad-11d1-80b4-00c04fd430c8` |
+| Endpoint | `ep_` | `ep_f47ac10b-58cc-4372-a567-0e02b2c3d479` |
+| Attempt | `att_` | `att_7c9e6679-7425-40de-944b-e07fc1f90ae7` |
+| Batch | `bat_` | `bat_a1b2c3d4-e5f6-7890-abcd-ef1234567890` |
+
+All API requests and responses use prefixed IDs. Pass prefixed IDs in URL paths, query parameters, and request bodies.
+
 ---
 
 ## Authentication
@@ -38,7 +52,7 @@ Response `201`:
 
 ```json
 {
-  "id": "uuid",
+  "id": "ep_550e8400-e29b-41d4-a716-446655440000",
   "name": "my-webhook",
   "url": "https://example.com/webhook",
   "status": "ACTIVE",
@@ -56,13 +70,13 @@ Response `200`: Array of endpoint objects.
 
 ### Get Endpoint
 
-`GET /v1/endpoints/{id}`
+`GET /v1/endpoints/{ep_id}`
 
 Response `200`: Single endpoint object. `404` if not found.
 
 ### Update Endpoint
 
-`PATCH /v1/endpoints/{id}`
+`PATCH /v1/endpoints/{ep_id}`
 
 ```json
 {
@@ -77,7 +91,7 @@ Response `200`: Updated endpoint object.
 
 ### Delete Endpoint
 
-`DELETE /v1/endpoints/{id}`
+`DELETE /v1/endpoints/{ep_id}`
 
 Response `204`: No content.
 
@@ -93,7 +107,7 @@ Response `204`: No content.
 {
   "type": "order.created",
   "payload": { "order_id": 123 },
-  "endpoint_ids": ["endpoint-uuid"],
+  "endpoint_ids": ["ep_550e8400-e29b-41d4-a716-446655440000"],
   "idempotency_key": "unique-key-123"
 }
 ```
@@ -105,11 +119,11 @@ Response `202`:
 
 ```json
 {
-  "event_id": "uuid",
+  "event_id": "evt_f47ac10b-58cc-4372-a567-0e02b2c3d479",
   "deliveries": [
     {
-      "delivery_id": "uuid",
-      "endpoint_id": "uuid",
+      "delivery_id": "del_6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "endpoint_id": "ep_550e8400-e29b-41d4-a716-446655440000",
       "created": true
     }
   ]
@@ -129,8 +143,8 @@ Response `202`:
 
 Query parameters:
 - `status` — Filter by status (PENDING, SCHEDULED, IN_PROGRESS, DELIVERED, FAILED, EXPIRED, CANCELLED)
-- `endpoint_id` — Filter by endpoint
-- `event_id` — Filter by event
+- `endpoint_id` — Filter by endpoint (e.g. `ep_550e8400-...`)
+- `event_id` — Filter by event (e.g. `evt_f47ac10b-...`)
 - `search` — Search by event type or endpoint name
 - `cursor` — Cursor for pagination (ISO datetime)
 - `limit` — Results per page (default 20, max 100)
@@ -147,13 +161,13 @@ Response `200`:
 
 ### Get Delivery
 
-`GET /v1/deliveries/{id}`
+`GET /v1/deliveries/{del_id}`
 
 Response `200`: Delivery object with nested `attempts` array.
 
 ### Cancel Delivery
 
-`POST /v1/deliveries/{id}/cancel`
+`POST /v1/deliveries/{del_id}/cancel`
 
 Cancels a non-terminal delivery. Returns `409` if the delivery is already in a terminal state.
 
@@ -162,7 +176,7 @@ Response `200`:
 ```json
 {
   "status": "cancelled",
-  "delivery_id": "uuid"
+  "delivery_id": "del_6ba7b810-9dad-11d1-80b4-00c04fd430c8"
 }
 ```
 
@@ -176,7 +190,7 @@ Response `200`:
 
 ```json
 {
-  "delivery_ids": ["uuid1", "uuid2"],
+  "delivery_ids": ["del_6ba7b810-9dad-11d1-80b4-00c04fd430c8", "del_a1b2c3d4-e5f6-7890-abcd-ef1234567890"],
   "dry_run": false
 }
 ```
@@ -188,7 +202,7 @@ Response `201`:
 
 ```json
 {
-  "batch_id": "uuid",
+  "batch_id": "bat_7c9e6679-7425-40de-944b-e07fc1f90ae7",
   "created_deliveries": 2,
   "dry_run": false
 }
@@ -244,7 +258,7 @@ Returns per-endpoint delivery stats.
 ```json
 [
   {
-    "endpoint_id": "uuid",
+    "endpoint_id": "ep_550e8400-e29b-41d4-a716-446655440000",
     "name": "my-webhook",
     "status": "ACTIVE",
     "total": 100,
