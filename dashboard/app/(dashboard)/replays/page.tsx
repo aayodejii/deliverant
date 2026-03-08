@@ -73,7 +73,7 @@ export default function ReplaysPage() {
               onChange={(e) => setDeliveryIds(e.target.value)}
               rows={6}
               className="w-full px-3 py-2.5 bg-elevated border border-border rounded-lg text-sm font-mono text-text-primary placeholder:text-text-muted resize-none"
-              placeholder={"Paste delivery IDs, one per line or comma-separated\n\n550e8400-e29b-41d4-a716-446655440000\n6ba7b810-9dad-11d1-80b4-00c04fd430c8"}
+              placeholder={"Paste delivery IDs, one per line or comma-separated\n\ndel_550e8400-e29b-41d4-a716-446655440000\ndel_6ba7b810-9dad-11d1-80b4-00c04fd430c8"}
             />
           </div>
 
