@@ -2,6 +2,7 @@ import uuid
 
 import pytest
 
+from apps.api.prefixed_ids import from_prefixed
 from apps.deliveries.models import Delivery
 from apps.replays.models import DeliveryBatch, DeliveryBatchItem
 from tests.factories import create_delivery, create_endpoint, create_event, create_tenant
@@ -13,7 +14,7 @@ class TestReplayCreate:
         delivery = create_delivery(tenant, event, endpoint, status=Delivery.Status.DELIVERED)
 
         response = auth_client.post("/v1/replays", {
-            "delivery_ids": [str(delivery.id)],
+            "delivery_ids": [f"del_{delivery.id}"],
             "dry_run": False,
         }, format="json")
 
@@ -21,8 +22,10 @@ class TestReplayCreate:
         body = response.json()
         assert body["created_deliveries"] == 1
         assert body["dry_run"] is False
-        assert DeliveryBatch.objects.filter(id=body["batch_id"]).exists()
-        assert DeliveryBatchItem.objects.filter(batch_id=body["batch_id"]).count() == 1
+        assert body["batch_id"].startswith("bat_")
+        batch_uuid = from_prefixed(body["batch_id"], "bat_")
+        assert DeliveryBatch.objects.filter(id=batch_uuid).exists()
+        assert DeliveryBatchItem.objects.filter(batch_id=batch_uuid).count() == 1
 
     def test_dry_run(self, auth_client, tenant, event, endpoint):
         delivery = create_delivery(tenant, event, endpoint)
@@ -30,7 +33,7 @@ class TestReplayCreate:
         initial_count = Delivery.objects.count()
 
         response = auth_client.post("/v1/replays", {
-            "delivery_ids": [str(delivery.id)],
+            "delivery_ids": [f"del_{delivery.id}"],
             "dry_run": True,
         }, format="json")
 
@@ -40,13 +43,13 @@ class TestReplayCreate:
 
     def test_missing_delivery_ids(self, auth_client):
         response = auth_client.post("/v1/replays", {
-            "delivery_ids": [str(uuid.uuid4())],
+            "delivery_ids": [f"del_{uuid.uuid4()}"],
             "dry_run": False,
         }, format="json")
         assert response.status_code == 404
 
     def test_exceeds_max_batch_size(self, auth_client, settings):
-        ids = [str(uuid.uuid4()) for _ in range(settings.MAX_REPLAY_BATCH_SIZE + 1)]
+        ids = [f"del_{uuid.uuid4()}" for _ in range(settings.MAX_REPLAY_BATCH_SIZE + 1)]
 
         response = auth_client.post("/v1/replays", {
             "delivery_ids": ids,

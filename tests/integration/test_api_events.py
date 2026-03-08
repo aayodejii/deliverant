@@ -5,6 +5,7 @@ import pytest
 from django.utils import timezone
 from rest_framework.test import APIClient
 
+from apps.api.prefixed_ids import from_prefixed
 from apps.deliveries.models import Delivery
 from apps.events.models import Event
 from tests.factories import create_api_key, create_delivery, create_endpoint, create_event, create_tenant
@@ -21,7 +22,7 @@ class TestEventCreate:
         data = {
             "type": "order.created",
             "payload": {"order_id": 1},
-            "endpoint_ids": [str(endpoint.id)],
+            "endpoint_ids": [f"ep_{endpoint.id}"],
             "idempotency_key": "test-key-1",
         }
 
@@ -30,11 +31,15 @@ class TestEventCreate:
         assert response.status_code == 202
         body = response.json()
         assert "event_id" in body
+        assert body["event_id"].startswith("evt_")
         assert len(body["deliveries"]) == 1
         assert body["deliveries"][0]["created"] is True
+        assert body["deliveries"][0]["delivery_id"].startswith("del_")
 
-        assert Event.objects.filter(id=body["event_id"]).exists()
-        assert Delivery.objects.filter(id=body["deliveries"][0]["delivery_id"]).exists()
+        event_uuid = from_prefixed(body["event_id"], "evt_")
+        delivery_uuid = from_prefixed(body["deliveries"][0]["delivery_id"], "del_")
+        assert Event.objects.filter(id=event_uuid).exists()
+        assert Delivery.objects.filter(id=delivery_uuid).exists()
 
     def test_validates_endpoint_ids_belong_to_tenant(self, auth_client):
         other_tenant = create_tenant("other")
@@ -43,7 +48,7 @@ class TestEventCreate:
         data = {
             "type": "test.event",
             "payload": {"key": "value"},
-            "endpoint_ids": [str(other_endpoint.id)],
+            "endpoint_ids": [f"ep_{other_endpoint.id}"],
         }
 
         response = auth_client.post("/v1/events", data, format="json")
@@ -60,7 +65,7 @@ class TestEventCreate:
         response = auth_client.post("/v1/events", {
             "type": "test.event",
             "payload": {"key": "value"},
-            "endpoint_ids": [str(uuid.uuid4())],
+            "endpoint_ids": [f"ep_{uuid.uuid4()}"],
         }, format="json")
         assert response.status_code == 400
 
@@ -68,7 +73,7 @@ class TestEventCreate:
         data = {
             "type": "order.created",
             "payload": {"order_id": 1},
-            "endpoint_ids": [str(endpoint.id)],
+            "endpoint_ids": [f"ep_{endpoint.id}"],
             "idempotency_key": "idem-key-1",
         }
 
@@ -81,7 +86,7 @@ class TestEventCreate:
         assert r1.json()["deliveries"][0]["delivery_id"] == r2.json()["deliveries"][0]["delivery_id"]
 
     def test_idempotency_conflict_different_payload(self, auth_client, tenant, endpoint):
-        ep_id = str(endpoint.id)
+        ep_id = f"ep_{endpoint.id}"
 
         auth_client.post("/v1/events", {
             "type": "order.created",
@@ -100,7 +105,7 @@ class TestEventCreate:
         assert response.status_code == 409
 
     def test_idempotency_key_reuse_outside_window(self, auth_client, tenant, endpoint):
-        ep_id = str(endpoint.id)
+        ep_id = f"ep_{endpoint.id}"
 
         r1 = auth_client.post("/v1/events", {
             "type": "order.created",
@@ -109,7 +114,8 @@ class TestEventCreate:
             "idempotency_key": "reuse-key",
         }, format="json")
 
-        old_delivery = Delivery.objects.get(id=r1.json()["deliveries"][0]["delivery_id"])
+        delivery_uuid = from_prefixed(r1.json()["deliveries"][0]["delivery_id"], "del_")
+        old_delivery = Delivery.objects.get(id=delivery_uuid)
         old_delivery.created_at = timezone.now() - timedelta(hours=73)
         old_delivery.save(update_fields=["created_at"])
 
@@ -122,14 +128,15 @@ class TestEventCreate:
 
         assert r2.status_code == 202
         assert r2.json()["deliveries"][0]["created"] is True
-        new_delivery = Delivery.objects.get(id=r2.json()["deliveries"][0]["delivery_id"])
+        new_delivery_uuid = from_prefixed(r2.json()["deliveries"][0]["delivery_id"], "del_")
+        new_delivery = Delivery.objects.get(id=new_delivery_uuid)
         assert new_delivery.idempotency_key_reused is True
 
     def test_basic_mode_deterministic_dedup(self, auth_client, tenant, endpoint):
         data = {
             "type": "order.created",
             "payload": {"order_id": 1},
-            "endpoint_ids": [str(endpoint.id)],
+            "endpoint_ids": [f"ep_{endpoint.id}"],
         }
 
         r1 = auth_client.post("/v1/events", data, format="json")
@@ -143,7 +150,7 @@ class TestEventCreate:
         data = {
             "type": "test.event",
             "payload": {"data": "x" * 300000},
-            "endpoint_ids": [str(endpoint.id)],
+            "endpoint_ids": [f"ep_{endpoint.id}"],
         }
 
         response = auth_client.post("/v1/events", data, format="json")

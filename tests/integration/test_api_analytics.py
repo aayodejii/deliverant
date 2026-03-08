@@ -69,6 +69,6 @@ class TestEndpointHealth:
         assert response.status_code == 200
         data = response.json()
         assert len(data) >= 1
-        assert data[0]["endpoint_id"] == str(endpoint.id)
+        assert data[0]["endpoint_id"] == f"ep_{endpoint.id}"
         assert "success_rate" in data[0]
         assert "total" in data[0]

@@ -28,10 +28,10 @@ class TestDeliveryList:
     def test_filter_by_endpoint_id(self, auth_client, tenant, event, endpoint):
         create_delivery(tenant, event, endpoint)
 
-        response = auth_client.get(f"/v1/deliveries?endpoint_id={endpoint.id}")
+        response = auth_client.get(f"/v1/deliveries?endpoint_id=ep_{endpoint.id}")
         assert response.status_code == 200
         for d in response.json()["results"]:
-            assert d["endpoint_id"] == str(endpoint.id)
+            assert d["endpoint_id"] == f"ep_{endpoint.id}"
 
     def test_search(self, auth_client, tenant, endpoint):
         event = create_event(tenant, type="order.completed")
@@ -62,14 +62,15 @@ class TestDeliveryDetail:
     def test_get_delivery_with_attempts(self, auth_client, tenant, delivery):
         create_attempt(tenant, delivery, attempt_number=1)
 
-        response = auth_client.get(f"/v1/deliveries/{delivery.id}")
+        response = auth_client.get(f"/v1/deliveries/del_{delivery.id}")
         assert response.status_code == 200
         body = response.json()
-        assert body["id"] == str(delivery.id)
+        assert body["id"] == f"del_{delivery.id}"
         assert len(body["attempts"]) == 1
+        assert body["attempts"][0]["id"].startswith("att_")
 
     def test_get_nonexistent(self, auth_client):
-        response = auth_client.get(f"/v1/deliveries/{uuid.uuid4()}")
+        response = auth_client.get(f"/v1/deliveries/del_{uuid.uuid4()}")
         assert response.status_code == 404
 
 
@@ -78,9 +79,10 @@ class TestDeliveryCancel:
     def test_cancel_non_terminal(self, auth_client, tenant, event, endpoint):
         delivery = create_delivery(tenant, event, endpoint, status=Delivery.Status.PENDING)
 
-        response = auth_client.post(f"/v1/deliveries/{delivery.id}/cancel")
+        response = auth_client.post(f"/v1/deliveries/del_{delivery.id}/cancel")
         assert response.status_code == 200
         assert response.json()["status"] == "cancelled"
+        assert response.json()["delivery_id"].startswith("del_")
 
         delivery.refresh_from_db()
         assert delivery.status == Delivery.Status.CANCELLED
@@ -92,5 +94,5 @@ class TestDeliveryCancel:
             terminal_at=timezone.now(),
         )
 
-        response = auth_client.post(f"/v1/deliveries/{delivery.id}/cancel")
+        response = auth_client.post(f"/v1/deliveries/del_{delivery.id}/cancel")
         assert response.status_code == 409

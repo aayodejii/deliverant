@@ -11,6 +11,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 from rest_framework.test import APIClient
 
+from apps.api.prefixed_ids import from_prefixed
 from apps.deliveries.models import Delivery
 from apps.attempts.models import Attempt
 from tests.factories import create_api_key, create_endpoint, create_tenant
@@ -32,12 +33,14 @@ class TestDeliveryFlow:
         response = client.post("/v1/events", {
             "type": "order.created",
             "payload": {"order_id": 42, "amount": 99.99},
-            "endpoint_ids": [str(endpoint.id)],
+            "endpoint_ids": [f"ep_{endpoint.id}"],
             "idempotency_key": "e2e-test-key",
         }, format="json")
 
         assert response.status_code == 202
-        delivery_id = response.json()["deliveries"][0]["delivery_id"]
+        prefixed_delivery_id = response.json()["deliveries"][0]["delivery_id"]
+        assert prefixed_delivery_id.startswith("del_")
+        delivery_id = from_prefixed(prefixed_delivery_id, "del_")
 
         delivery = Delivery.objects.get(id=delivery_id)
         assert delivery.status == Delivery.Status.PENDING
@@ -79,7 +82,7 @@ class TestDeliveryFlow:
         assert attempt.outcome == Attempt.Outcome.SUCCESS
         assert attempt.http_status == 200
 
-        detail_response = client.get(f"/v1/deliveries/{delivery_id}")
+        detail_response = client.get(f"/v1/deliveries/del_{delivery_id}")
         assert detail_response.status_code == 200
         assert detail_response.json()["status"] == "DELIVERED"
         assert len(detail_response.json()["attempts"]) == 1

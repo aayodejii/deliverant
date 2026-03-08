@@ -23,20 +23,21 @@ class TestEndpointsCRUD:
         response = auth_client.post("/v1/endpoints", data, format="json")
         assert response.status_code == 201
         assert response.json()["name"] == "new-endpoint"
+        assert response.json()["id"].startswith("ep_")
         assert Endpoint.objects.filter(tenant=tenant, name="new-endpoint").exists()
 
     def test_get_endpoint(self, auth_client, endpoint):
-        response = auth_client.get(f"/v1/endpoints/{endpoint.id}")
+        response = auth_client.get(f"/v1/endpoints/ep_{endpoint.id}")
         assert response.status_code == 200
-        assert response.json()["id"] == str(endpoint.id)
+        assert response.json()["id"] == f"ep_{endpoint.id}"
 
     def test_get_nonexistent_endpoint(self, auth_client):
-        response = auth_client.get(f"/v1/endpoints/{uuid.uuid4()}")
+        response = auth_client.get(f"/v1/endpoints/ep_{uuid.uuid4()}")
         assert response.status_code == 404
 
     def test_update_endpoint(self, auth_client, endpoint):
         response = auth_client.patch(
-            f"/v1/endpoints/{endpoint.id}",
+            f"/v1/endpoints/ep_{endpoint.id}",
             {"name": "updated-name"},
             format="json",
         )
@@ -44,13 +45,13 @@ class TestEndpointsCRUD:
         assert response.json()["name"] == "updated-name"
 
     def test_delete_endpoint(self, auth_client, endpoint):
-        response = auth_client.delete(f"/v1/endpoints/{endpoint.id}")
+        response = auth_client.delete(f"/v1/endpoints/ep_{endpoint.id}")
         assert response.status_code == 204
         assert not Endpoint.objects.filter(id=endpoint.id).exists()
 
     def test_pause_resume(self, auth_client, endpoint):
         response = auth_client.patch(
-            f"/v1/endpoints/{endpoint.id}",
+            f"/v1/endpoints/ep_{endpoint.id}",
             {"status": "PAUSED"},
             format="json",
         )
@@ -61,7 +62,7 @@ class TestEndpointsCRUD:
         assert endpoint.paused_at is not None
 
         response = auth_client.patch(
-            f"/v1/endpoints/{endpoint.id}",
+            f"/v1/endpoints/ep_{endpoint.id}",
             {"status": "ACTIVE"},
             format="json",
         )
@@ -75,9 +76,9 @@ class TestEndpointsCRUD:
         other_tenant = create_tenant("other-tenant")
         other_endpoint = create_endpoint(other_tenant, name="other-ep")
 
-        response = auth_client.get(f"/v1/endpoints/{other_endpoint.id}")
+        response = auth_client.get(f"/v1/endpoints/ep_{other_endpoint.id}")
         assert response.status_code == 404
 
         response = auth_client.get("/v1/endpoints")
         ep_ids = [ep["id"] for ep in response.json()]
-        assert str(other_endpoint.id) not in ep_ids
+        assert f"ep_{other_endpoint.id}" not in ep_ids
