@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.api.authentication import APIKeyAuthentication, IsAPIKeyAuthenticated
+from apps.api.prefixed_ids import to_prefixed
 from apps.attempts.models import Attempt
 from apps.deliveries.models import Delivery
 from apps.endpoints.models import Endpoint
@@ -135,7 +136,7 @@ class EndpointHealthView(APIView):
             )
 
             data.append({
-                "endpoint_id": str(ep.id),
+                "endpoint_id": to_prefixed("ep_", ep.id),
                 "name": ep.name,
                 "status": ep.status,
                 "total": stats["total"] or 0,

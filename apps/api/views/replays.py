@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.api.authentication import APIKeyAuthentication, IsAPIKeyAuthenticated
+from apps.api.prefixed_ids import to_prefixed
 from apps.api.serializers.replays import ReplayCreateSerializer
 from apps.deliveries.models import Delivery
 from apps.replays.models import DeliveryBatch, DeliveryBatchItem
@@ -38,13 +39,13 @@ class ReplayCreateView(APIView):
         ).select_related("event", "endpoint")
 
         found_ids = set(str(d.id) for d in source_deliveries)
-        missing = set(str(id) for id in delivery_ids) - found_ids
+        missing = set(str(did) for did in delivery_ids) - found_ids
         if missing:
             return Response(
                 {
                     "error": {
                         "code": "NOT_FOUND",
-                        "message": f"Deliveries not found: {', '.join(missing)}",
+                        "message": f"Deliveries not found: {', '.join(to_prefixed('del_', m) for m in missing)}",
                         "details": {},
                     }
                 },
@@ -87,7 +88,7 @@ class ReplayCreateView(APIView):
 
         return Response(
             {
-                "batch_id": str(batch.id),
+                "batch_id": to_prefixed("bat_", batch.id),
                 "created_deliveries": created_count,
                 "dry_run": dry_run,
             },

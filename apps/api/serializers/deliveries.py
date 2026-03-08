@@ -1,10 +1,13 @@
 from rest_framework import serializers
 
+from apps.api.prefixed_ids import PrefixedIDField
 from apps.attempts.models import Attempt
 from apps.deliveries.models import Delivery
 
 
 class AttemptSerializer(serializers.ModelSerializer):
+    id = PrefixedIDField("att_", read_only=True)
+
     class Meta:
         model = Attempt
         fields = [
@@ -24,6 +27,9 @@ class AttemptSerializer(serializers.ModelSerializer):
 
 
 class DeliverySerializer(serializers.ModelSerializer):
+    id = PrefixedIDField("del_", read_only=True)
+    event_id = PrefixedIDField("evt_", read_only=True)
+    endpoint_id = PrefixedIDField("ep_", read_only=True)
     endpoint_name = serializers.CharField(source="endpoint.name", read_only=True)
     event_type = serializers.CharField(source="event.type", read_only=True)
 

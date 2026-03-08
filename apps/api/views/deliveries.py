@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.api.authentication import APIKeyAuthentication, IsAPIKeyAuthenticated
+from apps.api.prefixed_ids import from_prefixed, to_prefixed
 from apps.api.serializers.deliveries import DeliverySerializer, DeliveryDetailSerializer
 from apps.deliveries.models import Delivery
 from apps.deliveries.state_machine import DeliveryStateMachine
@@ -27,11 +28,11 @@ class DeliveryListView(APIView):
 
         endpoint_id = request.query_params.get("endpoint_id")
         if endpoint_id:
-            queryset = queryset.filter(endpoint_id=endpoint_id)
+            queryset = queryset.filter(endpoint_id=from_prefixed(endpoint_id, "ep_"))
 
         event_id = request.query_params.get("event_id")
         if event_id:
-            queryset = queryset.filter(event_id=event_id)
+            queryset = queryset.filter(event_id=from_prefixed(event_id, "evt_"))
 
         search = request.query_params.get("search")
         if search:
@@ -70,9 +71,10 @@ class DeliveryDetailView(APIView):
 
     def get_object(self, request, delivery_id):
         try:
+            raw_id = from_prefixed(delivery_id, "del_")
             return Delivery.objects.select_related("endpoint", "event").prefetch_related(
                 "attempts"
-            ).get(id=delivery_id, tenant=request.user)
+            ).get(id=raw_id, tenant=request.user)
         except Delivery.DoesNotExist:
             return None
 
@@ -93,7 +95,8 @@ class DeliveryCancelView(APIView):
 
     def post(self, request, delivery_id):
         try:
-            delivery = Delivery.objects.get(id=delivery_id, tenant=request.user)
+            raw_id = from_prefixed(delivery_id, "del_")
+            delivery = Delivery.objects.get(id=raw_id, tenant=request.user)
         except Delivery.DoesNotExist:
             return Response(
                 {"error": {"code": "NOT_FOUND", "message": "Delivery not found", "details": {}}},
@@ -114,4 +117,4 @@ class DeliveryCancelView(APIView):
                 status=status.HTTP_409_CONFLICT,
             )
 
-        return Response({"status": "cancelled", "delivery_id": str(delivery.id)})
+        return Response({"status": "cancelled", "delivery_id": to_prefixed("del_", delivery.id)})

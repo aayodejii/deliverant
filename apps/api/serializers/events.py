@@ -6,6 +6,7 @@ from django.conf import settings
 from django.utils import timezone
 from rest_framework import serializers
 
+from apps.api.prefixed_ids import PrefixedIDField
 from apps.deliveries.models import Delivery
 from apps.endpoints.models import Endpoint
 from apps.events.models import Event
@@ -16,7 +17,7 @@ class EventCreateSerializer(serializers.Serializer):
     type = serializers.CharField(max_length=255)
     payload = serializers.JSONField()
     endpoint_ids = serializers.ListField(
-        child=serializers.UUIDField(),
+        child=PrefixedIDField("ep_"),
         min_length=1,
     )
     idempotency_key = serializers.CharField(max_length=255, required=False, allow_blank=True)
@@ -110,6 +111,7 @@ class EventCreateSerializer(serializers.Serializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
+    id = PrefixedIDField("evt_", read_only=True)
     payload = serializers.SerializerMethodField()
 
     class Meta:

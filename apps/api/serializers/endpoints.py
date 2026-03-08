@@ -1,9 +1,12 @@
 from rest_framework import serializers
 
+from apps.api.prefixed_ids import PrefixedIDField
 from apps.endpoints.models import Endpoint
 
 
 class EndpointSerializer(serializers.ModelSerializer):
+    id = PrefixedIDField("ep_", read_only=True)
+
     class Meta:
         model = Endpoint
         fields = [

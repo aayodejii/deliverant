@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.api.authentication import APIKeyAuthentication, IsAPIKeyAuthenticated
+from apps.api.prefixed_ids import from_prefixed
 from apps.api.serializers.endpoints import EndpointSerializer, EndpointCreateSerializer, EndpointUpdateSerializer
 from apps.endpoints.models import Endpoint
 
@@ -29,7 +30,8 @@ class EndpointDetailView(APIView):
 
     def get_object(self, request, endpoint_id):
         try:
-            return Endpoint.objects.get(id=endpoint_id, tenant=request.user)
+            raw_id = from_prefixed(endpoint_id, "ep_")
+            return Endpoint.objects.get(id=raw_id, tenant=request.user)
         except Endpoint.DoesNotExist:
             return None
 
