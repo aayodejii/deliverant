@@ -223,6 +223,12 @@ export default function LandingPage() {
           </Link>
 
           <div className="flex items-center gap-4">
+            <Link
+              href="/docs"
+              className="text-sm text-text-secondary hover:text-text-primary transition-colors"
+            >
+              Docs
+            </Link>
             <a
               href="https://github.com/aayodejii/deliverant"
               target="_blank"
