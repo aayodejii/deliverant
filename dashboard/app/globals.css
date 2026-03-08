@@ -113,6 +113,88 @@ input:focus, select:focus, textarea:focus {
   animation: slide-in-left 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Landing page — hero entrance */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-blur-in {
+  from { opacity: 0; filter: blur(8px); transform: translateY(12px); }
+  to { opacity: 1; filter: blur(0); transform: translateY(0); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+@keyframes line-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* Landing hero stagger — slower, more dramatic than dashboard */
+.hero-stagger > * {
+  opacity: 0;
+  animation: hero-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero-stagger > *:nth-child(1) { animation-delay: 100ms; }
+.hero-stagger > *:nth-child(2) { animation-delay: 250ms; }
+.hero-stagger > *:nth-child(3) { animation-delay: 400ms; }
+.hero-stagger > *:nth-child(4) { animation-delay: 550ms; }
+.hero-stagger > *:nth-child(5) { animation-delay: 700ms; }
+.hero-stagger > *:nth-child(6) { animation-delay: 850ms; }
+
+/* Delivery flow canvas entrance */
+.animate-flow-in {
+  opacity: 0;
+  animation: hero-blur-in 1s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+}
+
+/* Feature card hover lift */
+.feature-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease,
+              box-shadow 0.25s ease;
+}
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Code block typing cursor */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.typing-cursor::after {
+  content: "▌";
+  color: var(--color-accent);
+  animation: blink-cursor 1s step-end infinite;
+}
+
+/* Timeline step entrance */
+@keyframes step-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Glow accent ring for hub node on landing */
+.glow-ring {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+/* Floating animation for decorative elements */
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
