@@ -31,7 +31,7 @@ Duplicate deliveries are prevented within a defined window when idempotency is u
 
 ### Deterministic retries
 
-Retry behavior is explicit, bounded, and explainable — not infinite loops hidden in code.
+Retry behavior is explicit, bounded, and explainable. Not infinite loops hidden in code.
 
 ### Auditable delivery history
 
@@ -58,12 +58,24 @@ Deliverant **is not**:
 - A payment or financial execution system
 - An inbound webhook processor (V1)
 
+## Key features
+
+- **Prefixed IDs**: All resources use typed prefixed identifiers (`evt_`, `del_`, `ep_`, `att_`, `bat_`) for easy identification
+- **Signature verification**: HMAC-SHA256 signatures with configurable signing secrets per endpoint
+- **Exponential backoff**: Up to 12 retry attempts with full jitter, from 5 seconds to 24 hours
+- **Kill switch**: Redis-backed circuit breaker to pause all delivery processing
+- **Delivery analytics**: Volume, success rate, latency distribution, and per-endpoint health metrics
+- **Batch replay**: Re-deliver up to 1000 failed deliveries in a single request with dry-run support
+- **Cursor-based pagination**: Efficient pagination across all list endpoints
+
 ## High-level architecture
 
-- **Ingest API** — accepts events and delivery intents
-- **Scheduler** — determines when deliveries should run
-- **Workers** — execute HTTP deliveries and record outcomes
-- **PostgreSQL** — enforces invariants and auditability
+- **Ingest API**: Accepts events and creates deliveries to specified endpoints
+- **Scheduler**: Determines when deliveries should run using exponential backoff
+- **Workers**: Execute HTTP deliveries, record outcomes, and classify failures
+- **PostgreSQL**: Enforces invariants and stores full audit history
+- **Redis**: Task queue (Celery), caching, and kill switch state
+- **Dashboard**: Next.js app with delivery monitoring, endpoint management, and API docs
 
 The system is designed so that failures are visible, recoverable, and explainable.
 
@@ -79,20 +91,24 @@ Services start at:
 
 - API: http://localhost:8000
 - Dashboard: http://localhost:3000
+- API Docs: http://localhost:3000/docs
 
 See [docs/deployment.md](docs/deployment.md) for environment variables, configuration, and production setup.
 
 See [docs/api-reference.md](docs/api-reference.md) for the full API reference.
 
+## Tech stack
+
+- **Backend**: Python 3.12, Django 5.x, Django REST Framework
+- **Task Queue**: Celery + Redis
+- **Database**: PostgreSQL 16
+- **Frontend**: Next.js 16, TypeScript, Tailwind CSS v4
+- **Package Manager**: uv
+- **Deployment**: Docker Compose
+
 ## Status
 
 Deliverant is in active development.
-
-The current phase focuses on:
-
-- Core delivery correctness
-- Failure handling
-- Safe replay semantics
 
 Public availability will follow successful validation with design partners.
 
