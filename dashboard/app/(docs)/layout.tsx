@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { LuGithub, LuMenu, LuX } from "react-icons/lu";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
+import { DocsPrevNext } from "@/components/docs/DocsPrevNext";
 
 export default function DocsLayout({
   children,
@@ -68,6 +69,7 @@ export default function DocsLayout({
       <main className="pt-14 lg:pl-64">
         <div className="max-w-[800px] mx-auto px-6 sm:px-8 py-12 lg:py-16">
           {children}
+          <DocsPrevNext />
         </div>
       </main>
     </div>
