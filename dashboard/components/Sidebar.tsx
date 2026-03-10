@@ -12,7 +12,6 @@ import {
   LuPackage,
   LuRotateCcw,
   LuLogOut,
-  LuZap,
   LuSearch,
   LuSettings,
   LuEllipsis,
@@ -75,13 +74,21 @@ export function Sidebar() {
 
   return (
     <>
+      {/* Mobile top bar */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-12 bg-surface border-b border-border flex items-center px-4">
+        <div className="flex items-center gap-2">
+          <img src="/img/logo.png" alt="Deliverant" width={20} height={20} />
+          <span className="text-sm font-semibold tracking-tight text-text-primary">
+            Deliverant
+          </span>
+        </div>
+      </div>
+
       {/* Desktop sidebar */}
       <aside className="hidden md:flex w-56 h-screen sticky top-0 flex-col border-r border-border bg-surface shrink-0">
         <div className="px-5 py-5">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center">
-              <LuZap size={14} className="text-white" />
-            </div>
+            <img src="/img/logo.png" alt="Deliverant" width={24} height={24} />
             <span className="text-base font-semibold tracking-tight text-text-primary">
               Deliverant
             </span>

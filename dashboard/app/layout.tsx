@@ -16,6 +16,10 @@ const googleSansCode = Google_Sans_Code({
 export const metadata: Metadata = {
   title: "Deliverant",
   description: "Webhook reliability dashboard",
+  icons: {
+    icon: "/img/deliverant.png",
+    apple: "/img/deliverant.png",
+  },
 };
 
 export default function RootLayout({

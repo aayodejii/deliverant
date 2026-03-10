@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { LuZap, LuArrowRight, LuChevronDown } from "react-icons/lu";
+import { LuArrowRight, LuChevronDown } from "react-icons/lu";
 import { FaGoogle, FaGithub } from "react-icons/fa";
 
 export default function LoginPage() {
@@ -47,9 +47,7 @@ export default function LoginPage() {
 
       <div className="relative w-full max-w-sm px-6 animate-fade-in">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-10 h-10 rounded-xl bg-accent flex items-center justify-center mb-4">
-            <LuZap size={20} className="text-white" />
-          </div>
+          <img src="/img/logo.png" alt="Deliverant" width={36} height={36} className="mb-4" />
           <h1 className="text-xl font-semibold tracking-tight text-text-primary">Deliverant</h1>
           <p className="text-sm text-text-muted mt-1">Webhook reliability platform</p>
         </div>

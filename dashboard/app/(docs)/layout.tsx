@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+
 import { LuGithub, LuMenu, LuX } from "react-icons/lu";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
 import { DocsPrevNext } from "@/components/docs/DocsPrevNext";
@@ -31,9 +32,7 @@ export default function DocsLayout({
               )}
             </button>
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-7 h-7 rounded-lg bg-accent/15 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                <div className="w-2 h-2 rounded-full bg-accent" />
-              </div>
+              <img src="/img/logo.png" alt="Deliverant" width={24} height={24} />
               <span className="font-semibold text-[15px] tracking-tight">
                 Deliverant
               </span>

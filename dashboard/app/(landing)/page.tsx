@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+
 import {
   LuShieldCheck,
   LuFingerprint,
@@ -214,9 +215,7 @@ export default function LandingPage() {
       <nav className="sticky top-0 z-50 border-b border-border/50 bg-bg/80 backdrop-blur-xl">
         <div className="max-w-[1400px] mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-7 h-7 rounded-lg bg-accent/15 flex items-center justify-center">
-              <div className="w-2 h-2 rounded-full bg-accent" />
-            </div>
+            <img src="/img/logo.png" alt="Deliverant" width={24} height={24} />
             <span className="font-semibold text-[15px] tracking-tight">
               Deliverant
             </span>
