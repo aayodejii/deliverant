@@ -679,9 +679,7 @@ export default function LandingPage() {
       <footer className="border-t border-border">
         <div className="max-w-[1400px] mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-5 h-5 rounded-md bg-accent/15 flex items-center justify-center">
-              <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-            </div>
+            <img src="/img/logo.png" alt="Deliverant" width={18} height={18} />
             <span className="text-sm text-text-muted">Deliverant</span>
           </div>
           <div className="flex items-center gap-6 text-xs text-text-muted">
