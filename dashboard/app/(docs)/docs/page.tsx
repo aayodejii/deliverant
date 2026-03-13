@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { API_BASE_URL } from "@/lib/constants";
 import {
   LuKey,
   LuRadio,
@@ -47,7 +48,7 @@ export default function DocsOverview() {
         <h2 className="text-[10px] font-mono text-text-muted/70 tracking-[0.18em] uppercase mb-3">
           Base URL
         </h2>
-        <CodeBlock language="shell">{`https://api.deliverant.dev/v1`}</CodeBlock>
+        <CodeBlock language="shell">{API_BASE_URL}</CodeBlock>
       </div>
 
       {/* auth quick */}

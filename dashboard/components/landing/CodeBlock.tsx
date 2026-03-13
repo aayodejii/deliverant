@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { API_BASE_URL } from "@/lib/constants";
 
 export function CodeBlock() {
   const ref = useRef<HTMLDivElement>(null);
@@ -30,7 +31,7 @@ export function CodeBlock() {
   }, [visible]);
 
   const lines = [
-    { delay: 0, content: <><span className="text-accent">curl</span>{" "}<span className="text-text-secondary">-X POST</span>{" "}<span className="text-text-primary">https://api.deliverant.dev/v1/events</span>{" "}\</> },
+    { delay: 0, content: <><span className="text-accent">curl</span>{" "}<span className="text-text-secondary">-X POST</span>{" "}<span className="text-text-primary">{API_BASE_URL}/events</span>{" "}\</> },
     { delay: 80, content: <span className="pl-4">-H <span className="text-pending">&quot;Authorization: Bearer sk_live_...&quot;</span> \</span> },
     { delay: 160, content: <span className="pl-4">-H <span className="text-pending">&quot;Content-Type: application/json&quot;</span> \</span> },
     { delay: 240, content: <span className="pl-4">-d <span className="text-accent">&apos;{"{"}</span></span> },

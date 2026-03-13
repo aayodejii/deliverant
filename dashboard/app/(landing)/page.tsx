@@ -15,6 +15,7 @@ import {
 import { DeliveryFlow } from "@/components/landing/DeliveryFlow";
 import { CodeBlock } from "@/components/landing/CodeBlock";
 import { DeliveryTimeline } from "@/components/landing/DeliveryTimeline";
+import { GITHUB_URL } from "@/lib/constants";
 
 function useInView(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
@@ -229,7 +230,7 @@ export default function LandingPage() {
               Docs
             </Link>
             <a
-              href="https://github.com/aayodejii/deliverant"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-text-muted hover:text-text-primary transition-colors"
@@ -276,7 +277,7 @@ export default function LandingPage() {
 
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
               <a
-                href="https://github.com/aayodejii/deliverant"
+                href={GITHUB_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-accent text-bg font-semibold text-sm hover:bg-accent-hover transition-colors"
@@ -663,7 +664,7 @@ export default function LandingPage() {
 
           <div className="mt-8">
             <a
-              href="https://github.com/aayodejii/deliverant"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-accent text-bg font-semibold text-sm hover:bg-accent-hover transition-colors"
@@ -684,7 +685,7 @@ export default function LandingPage() {
           </div>
           <div className="flex items-center gap-6 text-xs text-text-muted">
             <a
-              href="https://github.com/aayodejii/deliverant"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-text-secondary transition-colors"

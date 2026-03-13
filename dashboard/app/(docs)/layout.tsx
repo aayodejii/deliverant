@@ -6,6 +6,7 @@ import Link from "next/link";
 import { LuGithub, LuMenu, LuX } from "react-icons/lu";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
 import { DocsPrevNext } from "@/components/docs/DocsPrevNext";
+import { GITHUB_URL } from "@/lib/constants";
 
 export default function DocsLayout({
   children,
@@ -45,7 +46,7 @@ export default function DocsLayout({
 
           <div className="flex items-center gap-5">
             <a
-              href="https://github.com/aayodejii/deliverant"
+              href={GITHUB_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-text-muted hover:text-text-primary transition-colors"

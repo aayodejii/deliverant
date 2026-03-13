@@ -1,4 +1,5 @@
 import { CodeBlock } from "@/components/docs/CodeBlock";
+import { API_BASE_URL } from "@/lib/constants";
 
 export default function AuthenticationDocs() {
   return (
@@ -24,7 +25,7 @@ export default function AuthenticationDocs() {
 
       <div>
         <h2 className="text-xl font-semibold mb-4">Example Request</h2>
-        <CodeBlock title="curl" language="shell">{`curl -X GET https://api.deliverant.dev/v1/endpoints \\
+        <CodeBlock title="curl" language="shell">{`curl -X GET ${API_BASE_URL}/endpoints \\
   -H "Authorization: Bearer dk_live_your_api_key_here" \\
   -H "Content-Type: application/json"`}</CodeBlock>
       </div>
