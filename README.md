@@ -108,9 +108,9 @@ See [docs/api-reference.md](docs/api-reference.md) for the full API reference.
 
 ## Status
 
-Deliverant is in active development.
+Deliverant is in active development. The core API, workers, and dashboard are production-ready for self-hosting.
 
-Public availability will follow successful validation with design partners.
+A hosted platform is coming. Join the waitlist at [deliverant.co](https://deliverant.co).
 
 ## Design philosophy
 

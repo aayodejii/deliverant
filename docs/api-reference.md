@@ -1,6 +1,8 @@
 # Deliverant API Reference
 
-Base URL: `http://localhost:8000/v1`
+Production base URL: `https://api.deliverant.co/v1`
+
+Local development: `http://localhost:8000/v1`
 
 All endpoints (except health and OAuth provision) require authentication via `Authorization: Bearer <api_key>`.
 
@@ -371,8 +373,31 @@ When Deliverant delivers a webhook, the following headers are included:
 
 ### Signature Verification
 
+The signature is computed as:
+
 ```
 signature = HMAC-SHA256(secret, "{timestamp}.{body}")
+```
+
+To verify on the receiving end:
+
+1. Extract `X-Webhook-Timestamp` and `X-Webhook-Signature` from the request headers
+2. Construct the signed string: `{timestamp}.{raw_request_body}`
+3. Compute `HMAC-SHA256(your_endpoint_secret, signed_string)` and hex-encode it
+4. Compare `v1={your_computed_hex}` against the `X-Webhook-Signature` header value
+5. Optionally reject requests where the timestamp is more than 5 minutes old
+
+Example (Python):
+
+```python
+import hmac, hashlib
+
+def verify_signature(secret: str, timestamp: str, body: bytes, signature: str) -> bool:
+    signed = f"{timestamp}.{body.decode()}"
+    expected = "v1=" + hmac.new(
+        secret.encode(), signed.encode(), hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
 ```
 
 ---

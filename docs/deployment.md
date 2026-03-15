@@ -9,13 +9,14 @@
 ## Quick Start
 
 ```bash
-git clone <repo>
+git clone https://github.com/aayodejii/deliverant.git
 cd deliverant
 docker compose up --build
 ```
 
 Services start at:
 - API: http://localhost:8000
+- Dashboard: http://localhost:3000
 - PostgreSQL: localhost:5432
 - Redis: localhost:6379
 
@@ -26,6 +27,7 @@ Services start at:
 | `api` | Django REST API (Gunicorn) | 8000 |
 | `worker` | Celery worker (delivery execution) | — |
 | `beat` | Celery beat (scheduler + lease recovery) | — |
+| `dashboard` | Next.js dashboard | 3000 |
 | `postgres` | PostgreSQL 16 | 5432 |
 | `redis` | Redis 7 | 6379 |
 
@@ -159,5 +161,6 @@ Worker logs are JSON-formatted with correlation IDs:
 - [ ] Set up Prometheus scraping for `/metrics`
 - [ ] Configure log aggregation for JSON logs
 - [ ] Set up Google and GitHub OAuth credentials for dashboard
-- [ ] Use HTTPS for dashboard and webhook delivery
+- [ ] Use HTTPS for all services (API, dashboard, webhook delivery endpoints)
 - [ ] Set `PROMETHEUS_MULTIPROC_DIR` as a shared volume between api and worker
+- [ ] Point `NEXT_PUBLIC_APP_URL` to your production dashboard domain
