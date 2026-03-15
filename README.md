@@ -97,6 +97,8 @@ See [docs/deployment.md](docs/deployment.md) for environment variables, configur
 
 See [docs/api-reference.md](docs/api-reference.md) for the full API reference.
 
+Hosted API docs: [deliverant.co/docs](https://deliverant.co/docs)
+
 ## Tech stack
 
 - **Backend**: Python 3.12, Django 5.x, Django REST Framework

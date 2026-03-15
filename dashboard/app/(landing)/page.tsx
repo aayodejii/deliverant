@@ -394,7 +394,7 @@ export default function WaitlistPage() {
             { label: "Deterministic retries", desc: "Exponential backoff with bounded attempts. Visible, predictable, explainable.", color: "text-pending" },
             { label: "Full delivery visibility", desc: "Every attempt recorded with timestamps, status codes, and failure classification.", color: "text-in-progress" },
             { label: "Safe replay", desc: "Replay failed deliveries with dry-run mode, batch controls, and audit trail.", color: "text-accent" },
-            { label: "HMAC signatures", desc: "Every delivery is signed. Receivers can verify authenticity and integrity.", color: "text-text-primary" },
+            { label: "HMAC signatures", desc: "Every delivery is signed. Receivers can verify authenticity and integrity.", color: "text-failed" },
           ].map((feature) => (
             <div
               key={feature.label}
