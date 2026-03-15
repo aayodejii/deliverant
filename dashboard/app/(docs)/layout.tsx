@@ -54,10 +54,10 @@ export default function DocsLayout({
               <LuGithub className="w-[18px] h-[18px]" />
             </a>
             <Link
-              href="/login"
+              href="/"
               className="text-[13px] text-text-secondary hover:text-text-primary transition-colors"
             >
-              Dashboard
+              Waitlist
             </Link>
           </div>
         </div>
@@ -68,6 +68,17 @@ export default function DocsLayout({
       {/* main content */}
       <main className="pt-14 lg:pl-64">
         <div className="max-w-[800px] mx-auto px-6 sm:px-8 py-12 lg:py-16">
+          {/* coming soon banner */}
+          <div className="flex items-center gap-3 px-4 py-3 mb-10 rounded-lg border border-pending/20 bg-pending/[0.04]">
+            <div className="w-1.5 h-1.5 rounded-full bg-pending shrink-0" />
+            <p className="text-[13px] text-text-secondary">
+              The hosted platform is coming soon.{" "}
+              <a href="/" className="text-accent hover:text-accent-hover transition-colors">
+                Join the waitlist
+              </a>{" "}
+              to be notified at launch.
+            </p>
+          </div>
           {children}
           <DocsPrevNext />
         </div>
