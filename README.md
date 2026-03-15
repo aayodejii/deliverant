@@ -1,10 +1,19 @@
 # Deliverant
 
+[![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12-blue)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/django-5.x-green)](https://www.djangoproject.com/)
+[![Docker](https://img.shields.io/badge/docker-compose-2496ED?logo=docker&logoColor=white)](docker-compose.yml)
+
 Deliverant is a hosted reliability layer for outbound webhooks.
 
 It ensures webhook events are delivered safely under failure, with deterministic retries, enforced deduplication, and full delivery visibility.
 
 This project is intentionally opinionated. It prioritizes correctness, transparency, and trust over convenience or speed.
+
+![Dashboard overview](docs/img/overview.png)
+
+![Delivery list](docs/img/deliveries.png)
 
 ## Why Deliverant exists
 
