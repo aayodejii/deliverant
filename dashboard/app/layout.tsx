@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Google_Sans, Google_Sans_Code } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -41,6 +42,7 @@ export default function RootLayout({
             },
           }}
         />
+        <Analytics />
       </body>
     </html>
   );
