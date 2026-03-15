@@ -11,8 +11,10 @@ It ensures webhook events are delivered safely under failure, with deterministic
 
 This project is intentionally opinionated. It prioritizes correctness, transparency, and trust over convenience or speed.
 
+**Dashboard overview**
 ![Dashboard overview](docs/img/overview.png)
 
+**Delivery list**
 ![Delivery list](docs/img/deliveries.png)
 
 ## Why Deliverant exists
