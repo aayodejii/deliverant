@@ -131,6 +131,10 @@ Correctness and trust are more important than speed, features, or growth.
 
 Every feature is evaluated against this principle.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 [AGPL-3.0](LICENSE)
